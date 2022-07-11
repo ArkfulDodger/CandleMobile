@@ -21,9 +21,11 @@ public class AnimationAndMovementController : MonoBehaviour
     private bool _isMovementPressed;
     private bool _isRunPressed;
 
-    // scalable properties
+    // adjustable variables
     private readonly float _runMultiplier = 3.0f;
     private readonly float _rotationFactorPerFrame = 15f;
+    private readonly float _groundedGravity = -.05f;
+    private readonly float _gravity = -9.8f;
 
     private void Awake()
     {
@@ -58,11 +60,14 @@ public class AnimationAndMovementController : MonoBehaviour
         _playerControls.CharacterControls.Move.started -= OnMovementInput;
         _playerControls.CharacterControls.Move.performed -= OnMovementInput;
         _playerControls.CharacterControls.Move.canceled -= OnMovementInput;
+        _playerControls.CharacterControls.Run.started -= OnRunInput;
+        _playerControls.CharacterControls.Run.canceled -= OnRunInput;
     }
 
     // Update is called once per frame
     void Update()
     {
+        UpdateGravity();
         UpdateMovement();
         UpdateRotation();
         UpdateAnimation();
@@ -83,6 +88,12 @@ public class AnimationAndMovementController : MonoBehaviour
     void OnRunInput(InputAction.CallbackContext context)
     {
         _isRunPressed = context.ReadValueAsButton();
+    }
+
+    // update gravity for this frame
+    void UpdateGravity()
+    {
+        _currentMovement.y = _characterController.isGrounded ? _groundedGravity : _gravity;
     }
 
     // execute movement for this frame
