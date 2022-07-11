@@ -76,11 +76,7 @@ public class AnimationAndMovementController : MonoBehaviour
     // updates on all Movement input events
     void OnMovementInput (InputAction.CallbackContext context)
     {
-        float runMultiplier = _isRunPressed ? _runMultiplier : 1f;
-
         _currentMovementInput = context.ReadValue<Vector2>();
-        _currentMovement.x = _currentMovementInput.x * runMultiplier;
-        _currentMovement.z = _currentMovementInput.y * runMultiplier;
         _isMovementPressed = _currentMovementInput.magnitude != 0;
     }
 
@@ -106,6 +102,12 @@ public class AnimationAndMovementController : MonoBehaviour
     // execute movement for this frame
     void UpdateMovement()
     {
+        // update speed for running or walking
+        float runMultiplier = _isRunPressed ? _runMultiplier : 1f;
+        _currentMovement.x = _currentMovementInput.x * runMultiplier;
+        _currentMovement.z = _currentMovementInput.y * runMultiplier;
+
+        // apply movement to character controller
         _characterController.Move(_currentMovement * Time.deltaTime);
     }
 
