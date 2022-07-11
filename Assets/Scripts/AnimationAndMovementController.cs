@@ -24,7 +24,7 @@ public class AnimationAndMovementController : MonoBehaviour
     // adjustable variables
     private readonly float _runMultiplier = 3.0f;
     private readonly float _rotationFactorPerFrame = 15f;
-    private readonly float _groundedGravity = -.05f;
+    private readonly float _groundedGravity = -0.05f;
     private readonly float _gravity = -9.8f;
 
     private void Awake()
@@ -93,7 +93,14 @@ public class AnimationAndMovementController : MonoBehaviour
     // update gravity for this frame
     void UpdateGravity()
     {
-        _currentMovement.y = _characterController.isGrounded ? _groundedGravity : _gravity;
+        if (_characterController.isGrounded)
+        {
+            _currentMovement.y = _groundedGravity;
+        }
+        else
+        {
+            _currentMovement.y += _gravity * Time.deltaTime;
+        }
     }
 
     // execute movement for this frame
