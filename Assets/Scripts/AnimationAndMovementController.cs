@@ -11,11 +11,19 @@ public class AnimationAndMovementController : MonoBehaviour
     private CharacterController _characterController;
     private Animator _animator;
 
+    // animation variables
+    private int _isWalkingHash;
+    private int _isRunningHash;
+
     // input variables
     private Vector2 _currentMovementInput;
     private Vector3 _currentMovement;
     private bool _isMovementPressed;
-    private float _rotationFactorPerFrame = 13f;
+    private bool _isRunPressed;
+
+    // scalable properties
+    private readonly float _runMultiplier = 3.0f;
+    private readonly float _rotationFactorPerFrame = 15f;
 
     private void Awake()
     {
@@ -23,6 +31,9 @@ public class AnimationAndMovementController : MonoBehaviour
         _playerControls = new PlayerControls();
         _characterController = GetComponent<CharacterController>();
         _animator = GetComponent<Animator>();
+
+        _isWalkingHash = Animator.StringToHash("isWalking");
+        _isRunningHash = Animator.StringToHash("isRunning");
     }
 
     private void OnEnable()
@@ -34,6 +45,8 @@ public class AnimationAndMovementController : MonoBehaviour
         _playerControls.CharacterControls.Move.started += OnMovementInput;
         _playerControls.CharacterControls.Move.performed += OnMovementInput;
         _playerControls.CharacterControls.Move.canceled += OnMovementInput;
+        _playerControls.CharacterControls.Run.started += OnRunInput;
+        _playerControls.CharacterControls.Run.canceled += OnRunInput;
     }
 
     private void OnDisable()
@@ -58,10 +71,18 @@ public class AnimationAndMovementController : MonoBehaviour
     // updates on all Movement input events
     void OnMovementInput (InputAction.CallbackContext context)
     {
+        float runMultiplier = _isRunPressed ? _runMultiplier : 1f;
+
         _currentMovementInput = context.ReadValue<Vector2>();
-        _currentMovement.x = _currentMovementInput.x;
-        _currentMovement.z = _currentMovementInput.y;
+        _currentMovement.x = _currentMovementInput.x * runMultiplier;
+        _currentMovement.z = _currentMovementInput.y * runMultiplier;
         _isMovementPressed = _currentMovementInput.magnitude != 0;
+    }
+
+    // updates on run trigger and release
+    void OnRunInput(InputAction.CallbackContext context)
+    {
+        _isRunPressed = context.ReadValueAsButton();
     }
 
     // execute movement for this frame
@@ -75,8 +96,6 @@ public class AnimationAndMovementController : MonoBehaviour
     {
         if (!_isMovementPressed) return;
 
-        Debug.Log("Rotation being Updated");
-
         Vector3 movementDirection = new(_currentMovement.x, 0.0f, _currentMovement.z);
         Quaternion targetRotation = Quaternion.LookRotation(movementDirection);
         Quaternion currentRotation = transform.rotation;
@@ -87,16 +106,25 @@ public class AnimationAndMovementController : MonoBehaviour
     // execute animation for this frame
     void UpdateAnimation()
     {
-        bool isWalking = _animator.GetBool("isWalking");
-        bool isRunning = _animator.GetBool("isRunning");
+        bool isWalking = _animator.GetBool(_isWalkingHash);
+        bool isRunning = _animator.GetBool(_isRunningHash);
 
         if (_isMovementPressed && !isWalking)
         {
-            _animator.SetBool("isWalking", true);
+            _animator.SetBool(_isWalkingHash, true);
         }
         else if (!_isMovementPressed && isWalking)
         {
-            _animator.SetBool("isWalking", false);
+            _animator.SetBool(_isWalkingHash, false);
+        }
+
+        if (_isMovementPressed && _isRunPressed && !isRunning)
+        {
+            _animator.SetBool(_isRunningHash, true);
+        }
+        else if ((!_isMovementPressed || !_isRunPressed) && isRunning)
+        {
+            _animator.SetBool(_isRunningHash, false);
         }
     }
 }
