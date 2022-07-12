@@ -8,7 +8,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject _loadingCanvas;
     [SerializeField] private Image _progressBar;
     private readonly float _fullyLoaded = 0.9f;
-    private float _target;
+    private float _targetFillAmount;
 
     // ENFORCE SINGLETON
     public static LevelManager Instance { get; private set; }
@@ -28,7 +28,7 @@ public class LevelManager : MonoBehaviour
     public async void LoadScene(string sceneName)
     {
         // set target and fill bar back to 0
-        _target = 0f;
+        _targetFillAmount = 0f;
         _progressBar.fillAmount = 0f;
 
         // Load Scene Asynchronously
@@ -43,8 +43,8 @@ public class LevelManager : MonoBehaviour
         // update the progress bar in a loop until the scene is loaded (at 90%)
         do
         {
-            //await Task.Delay(100);
-            _target = scene.progress / _fullyLoaded;
+            await Task.Delay(100);
+            _targetFillAmount = scene.progress / _fullyLoaded;
             //_progressBar.fillAmount = scene.progress;
         } while (scene.progress < _fullyLoaded);
 
@@ -59,6 +59,6 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        _progressBar.fillAmount = Mathf.MoveTowards(_progressBar.fillAmount, _target, 3 * Time.deltaTime);
+        _progressBar.fillAmount = Mathf.MoveTowards(_progressBar.fillAmount, _targetFillAmount, 3 * Time.deltaTime);
     }
 }
