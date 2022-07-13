@@ -15,7 +15,6 @@ public class DoorTrigger : MonoBehaviour
     {
         if (!_door) return;
 
-        Debug.Log("Trigger Enter Called!");
         GameEvents.Instance.DoorwayTriggerEnterHandler(_door);
     }
 
@@ -23,7 +22,6 @@ public class DoorTrigger : MonoBehaviour
     {
         if (!_door) return;
 
-        Debug.Log("Trigger Exit Called!");
         GameEvents.Instance.DoorwayTriggerExitHandler(_door);
     }
 }

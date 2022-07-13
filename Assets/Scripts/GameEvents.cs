@@ -8,23 +8,17 @@ public class GameEvents : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-            Destroy(this);
-        else
+        if (Instance == null)
             Instance = this;
+        else
+            Destroy(this);
     }
 
     // Events
     public event Action<DoorController> DoorwayTriggerEnter;
-    public void DoorwayTriggerEnterHandler(DoorController door)
-    {
-        DoorwayTriggerEnter?.Invoke(door);
-    }
-
     public event Action<DoorController> DoorwayTriggerExit;
-    public void DoorwayTriggerExitHandler(DoorController door)
-    {
-        DoorwayTriggerExit?.Invoke(door);
-    }
 
+    // Event Handlers
+    public void DoorwayTriggerEnterHandler(DoorController door) { DoorwayTriggerEnter?.Invoke(door); }
+    public void DoorwayTriggerExitHandler(DoorController door) { DoorwayTriggerExit?.Invoke(door); }
 }
